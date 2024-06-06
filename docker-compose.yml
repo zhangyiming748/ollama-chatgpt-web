@@ -13,9 +13,9 @@ services:
     container_name: ollama
     image: ollama/ollama
     ports:
-      - 8000:8000
+      - 11434:11434
     environment:
-      - OLLAMA_HOST=0.0.0.0:8000
+      - OLLAMA_HOST=0.0.0.0:11434
       - OLLAMA_MODELS=/data/models
       - OLLAMA_DEBUG=1
     volumes:
@@ -25,28 +25,15 @@ services:
     entrypoint: /run_ollama.sh
 
 ## https://github.com/Chanzhaoyu/chatgpt-web
-  app:
-    image: chenzhaoyu94/chatgpt-web 
-    container_name: app
-    ports:
-      - 8192:3002
-    environment:
-      # choose one
-      OPENAI_API_KEY: sk-xxx
-      # choose one
-      OPENAI_ACCESS_TOKEN: xxx
-      # API interface address, optional, available when OPENAI_API_KEY is set
-      OPENAI_API_BASE_URL: http://ollama:8000/v1
-      # API model, optional, available when OPENAI_API_KEY is set, https://platform.openai.com/docs/models
-      # gpt-4, gpt-4-turbo-preview, gpt-4-0125-preview, gpt-4-1106-preview, gpt-4-0314, gpt-4-0613, gpt-4-32k, gpt-4-32k-0314, gpt-4-32k-0613, gpt-3.5-turbo-16k, gpt-3.5-turbo-16k-0613, gpt-3.5-turbo, gpt-3.5-turbo-0301, gpt-3.5-turbo-0613, text-davinci-003, text-davinci-002, code-davinci-002
-      OPENAI_API_MODEL: qwen:0.5b
-      # reverse proxy, optional
-      AUTH_SECRET_KEY:
-      # maximum number of requests per hour, optional, unlimited by default
-      MAX_REQUEST_PER_HOUR: 0
-      # timeout, unit milliseconds, optional
-      TIMEOUT_MS: 60000
+  open-webui:
+        ports:
+            - 8192:8080
+        extra_hosts:
+            - host.docker.internal:host-gateway
+        volumes:
+            - ./open-webui:/app/backend/data
+        container_name: open-webui
+        restart: always
+        image: ghcr.io/open-webui/open-webui:main
 
-networks:
-  default:
-    name: ollama-network
+
